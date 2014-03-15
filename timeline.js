@@ -16,53 +16,22 @@
       updateY = function() {
         return _this.y = _this.lines.length * _this.lineHeight + _this.margin.top;
       };
-      render = function(el, data) {
-        var age, expantancy, headerText, line, _i, _len, _ref;
-        _this.from = new Moment(data.from);
-        _this.to = new Moment(data.to);
-        if (_this.paper && _this.paper.remove) {
-          _this.paper.remove();
-        }
-        _this.days = _this.to.diff(_this.from, "days");
-        _this.width = Math.max(_this.minimumWidth, $(el).width()) - _this.margin.left - _this.margin.right;
-        _this.height = data.lines.length * _this.lineHeight + _this.margin.top + _this.margin.bottom;
-        _this.pixelsPerDay = _this.width / _this.days;
-        _this.xNow = dateToPx(new Date());
-        _this.lines = [];
-        _this.paper = new Raphael(el, _this.width + _this.margin.right + _this.margin.left, _this.height + _this.margin.top + _this.margin.bottom);
-        updateY();
-        age = new Moment().diff(_this.from, "years");
-        expantancy = new Moment(_this.to).diff(_this.from, "years");
-        headerText = data.what.replace("{age}", age).replace("{expantancy}", expantancy);
-        _this.lines.push(renderLine({
-          "from": _this.from,
-          "to": _this.to,
-          "what": headerText
-        }));
-        updateY();
-        _ref = data.lines;
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          line = _ref[_i];
-          _this.lines.push(renderLine(line));
-          updateY();
-        }
-        return renderToday();
+      renderStartMarker = function(line) {
+        var startMarker;
+        startMarker = _this.paper.circle(dateToPx(line.from), _this.y, 3).attr({
+          "fill": "#000000",
+          "title": new Moment(line.from).year()
+        });
+        return startMarker;
       };
-      renderLine = function(line) {
-        var result;
-        if (!line.to) {
-          line.to = _this.to;
+      renderEndMarker = function(line) {
+        if (_this.to === line.to) {
+          return;
         }
-        if (!line.from) {
-          line.from = _this.from;
-        }
-        result = {};
-        result.pastLine = renderPastLine(line);
-        result.futureLine = renderFutureLine(line);
-        result.startMarker = renderStartMarker(line);
-        result.endMarker = renderEndMarker(line);
-        result.text = renderText(line);
-        return result;
+        return _this.paper.circle(dateToPx(line.to), _this.y, 3).attr({
+          "fill": "#000000",
+          "title": new Moment(line.to).year()
+        });
       };
       renderPastLine = function(line) {
         pastLine;
@@ -94,6 +63,34 @@
         }
         return futureLine;
       };
+      renderText = function(line) {
+        var text, textWidth, x;
+        x = dateToPx(line.from) + 2;
+        text = _this.paper.text(x, _this.y - 10, line.what).attr({
+          "text-anchor": "start"
+        });
+        textWidth = text.getBBox().width;
+        if (x < _this.xNow && ((x + textWidth + 5) > _this.xNow)) {
+          text.attr("x", _this.xNow - textWidth - 5);
+        }
+        return text;
+      };
+      renderLine = function(line) {
+        var result;
+        if (!line.to) {
+          line.to = _this.to;
+        }
+        if (!line.from) {
+          line.from = _this.from;
+        }
+        result = {};
+        result.pastLine = renderPastLine(line);
+        result.futureLine = renderFutureLine(line);
+        result.startMarker = renderStartMarker(line);
+        result.endMarker = renderEndMarker(line);
+        result.text = renderText(line);
+        return result;
+      };
       renderToday = function() {
         var y;
         y = _this.paper.height;
@@ -106,34 +103,37 @@
           "text-anchor": "start"
         });
       };
-      renderStartMarker = function(line) {
-        var startMarker;
-        startMarker = _this.paper.circle(dateToPx(line.from), _this.y, 3).attr({
-          "fill": "#000000",
-          "title": new Moment(line.from).year()
-        });
-        return startMarker;
-      };
-      renderEndMarker = function(line) {
-        if (_this.to === line.to) {
-          return;
+      render = function(el, data) {
+        var age, expantancy, headerText, line, _i, _len, _ref;
+        _this.from = new Moment(data.from);
+        _this.to = new Moment(data.to);
+        if (_this.paper && _this.paper.remove) {
+          _this.paper.remove();
         }
-        return _this.paper.circle(dateToPx(line.to), _this.y, 3).attr({
-          "fill": "#000000",
-          "title": new Moment(line.to).year()
-        });
-      };
-      renderText = function(line) {
-        var text, textWidth, x;
-        x = dateToPx(line.from) + 2;
-        text = _this.paper.text(x, _this.y - 10, line.what).attr({
-          "text-anchor": "start"
-        });
-        textWidth = text.getBBox().width;
-        if (x < _this.xNow && ((x + textWidth + 5) > _this.xNow)) {
-          text.attr("x", _this.xNow - textWidth - 5);
+        _this.days = _this.to.diff(_this.from, "days");
+        _this.width = Math.max(_this.minimumWidth, $(el).width()) - _this.margin.left - _this.margin.right;
+        _this.height = data.lines.length * _this.lineHeight + _this.margin.top + _this.margin.bottom;
+        _this.pixelsPerDay = _this.width / _this.days;
+        _this.xNow = dateToPx(new Date());
+        _this.lines = [];
+        _this.paper = new Raphael(el, _this.width + _this.margin.right + _this.margin.left, _this.height + _this.margin.top + _this.margin.bottom);
+        updateY();
+        age = new Moment().diff(_this.from, "years");
+        expantancy = new Moment(_this.to).diff(_this.from, "years");
+        headerText = data.what.replace("{age}", age).replace("{expantancy}", expantancy);
+        _this.lines.push(renderLine({
+          "from": _this.from,
+          "to": _this.to,
+          "what": headerText
+        }));
+        updateY();
+        _ref = data.lines;
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          line = _ref[_i];
+          _this.lines.push(renderLine(line));
+          updateY();
         }
-        return text;
+        return renderToday();
       };
       return {
         render: render
