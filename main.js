@@ -6,7 +6,7 @@
       "moment": "./bower_components/momentjs/moment",
       "raphael": "./bower_components/raphael/raphael",
       "text": "./bower_components/requirejs-text/text",
-      "timeline": "timeline"
+      "timeline": "./timeline"
     },
     shim: {
       "bootstrap-js": {

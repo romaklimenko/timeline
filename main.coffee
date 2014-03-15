@@ -8,7 +8,7 @@ require.config
     "text": "./bower_components/requirejs-text/text"
 
     # component
-    "timeline": "timeline",
+    "timeline": "./timeline",
 
   shim:
     "bootstrap-js":
