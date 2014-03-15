@@ -1,0 +1,64 @@
+{
+  "from": "1981-03-12",
+  "to": "2056-03-12",
+  "what": "I'm {age} and plan to live about {expantancy} years, which is very optimistic.",
+  "lines": [
+    {
+      "from": "1988-09-01",
+      "to": "1995-05-25",
+      "what": "Studied in the Lyceum #100."
+    },
+    {
+      "from": "1995-09-01",
+      "to": "1998-05-25",
+      "what": "Studied in the public school #33."
+    },
+    {
+      "from": "1998-09-01",
+      "to": "2001-09-01",
+      "what": "Worked in NIOKB NESSY as labaratory."
+    },
+    {
+      "from": "1999-09-01",
+      "to": "2004-06-01",
+      "what": "Studied in the Dnipropetrovsk State Financial Academy. Specialist of Enterprise Finances."
+    },
+    {
+      "from": "2002-02-25",
+      "to": "2007-03-05",
+      "what": "Worked in Privatbank as economist."
+    },
+    {
+      "from": "2004-08-06",
+      "what": "Married."
+    },
+    {
+      "from": "2005-05-11",
+      "what": "Daughter."
+    },
+    {
+      "from": "2007-03-05",
+      "to": "2008-08-01",
+      "what": "Worked in Nebesa as Software Developer."
+    },
+    {
+      "from": "2008-08-01",
+      "to": "2009-09-01",
+      "what": "Worked in SaM Solutions GmbH as Software Developer."
+    },
+    {
+      "from": "2009-10-01",
+      "to": "2009-12-31",
+      "what": "Worked in Exigen as Software Developer."
+    },
+    {
+      "from": "2010-01-01",
+      "to": "2041-03-12",
+      "what": "Working in Sitecore Ukraine as Software Developer."
+    },
+    {
+      "from": "2041-03-12",
+      "what": "Expected retirement."
+    }
+  ]
+}
