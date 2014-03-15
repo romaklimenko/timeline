@@ -1,11 +1,11 @@
 (function() {
   require.config({
     paths: {
-      "bootstrap-js": "../bower_components/bootstrap/dist/js/bootstrap",
-      "jquery": "../bower_components/jquery/dist/jquery",
-      "moment": "../bower_components/momentjs/moment",
-      "raphael": "../bower_components/raphael/raphael",
-      "text": "../bower_components/requirejs-text/text",
+      "bootstrap-js": "./bower_components/bootstrap/dist/js/bootstrap",
+      "jquery": "./bower_components/jquery/dist/jquery",
+      "moment": "./bower_components/momentjs/moment",
+      "raphael": "./bower_components/raphael/raphael",
+      "text": "./bower_components/requirejs-text/text",
       "timeline": "timeline"
     },
     shim: {
