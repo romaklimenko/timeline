@@ -14,5 +14,5 @@ require.config
     "bootstrap-js":
       deps: ["jquery"]
 
-require ["jquery", "timeline", "text!../timeline.json"], ($, Timeline, text) =>
+require ["jquery", "timeline", "text!./timeline.json"], ($, Timeline, text) =>
   Timeline.render($("#timeline")[0], JSON.parse(text))

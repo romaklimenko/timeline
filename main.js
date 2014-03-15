@@ -15,7 +15,7 @@
     }
   });
 
-  require(["jquery", "timeline", "text!../timeline.json"], (function(_this) {
+  require(["jquery", "timeline", "text!./timeline.json"], (function(_this) {
     return function($, Timeline, text) {
       return Timeline.render($("#timeline")[0], JSON.parse(text));
     };
