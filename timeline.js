@@ -67,11 +67,15 @@
         var text, textWidth, x;
         x = dateToPx(line.from) + 2;
         text = _this.paper.text(x, _this.y - 10, line.what).attr({
-          "text-anchor": "start"
+          "text-anchor": "start",
+          "font-family": "inherit",
+          "font-size": 12
         });
         textWidth = text.getBBox().width;
         if (x < _this.xNow && ((x + textWidth + 5) > _this.xNow)) {
-          text.attr("x", _this.xNow - textWidth - 5);
+          text.attr({
+            "x": _this.xNow - textWidth - 5
+          });
         }
         return text;
       };
@@ -98,9 +102,11 @@
           "stroke": "#FF0000",
           "stroke-width": 2
         });
-        return _this.paper.text(_this.xNow + 5, y - _this.margin.bottom - 1, "Living my life, " + (new Moment().diff(_this.from, "days") * 100 / _this.days).toFixed(2) + "% done.").attr({
+        return _this.paper.text(_this.xNow + 5, y - _this.margin.bottom - 4, "Living my life, " + (new Moment().diff(_this.from, "days") * 100 / _this.days).toFixed(2) + "% done.").attr({
           "fill": "#FF0000",
-          "text-anchor": "start"
+          "text-anchor": "start",
+          "font-family": "inherit",
+          "font-size": 12
         });
       };
       render = function(el, data) {
