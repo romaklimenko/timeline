@@ -98,12 +98,12 @@ Render a text above the line.
 
         text = @paper
           .text(x, @y - 10, line.what)
-          .attr({ "text-anchor": "start" })
+          .attr({ "text-anchor": "start", "font-family": "inherit", "font-size": 12 })
 
         textWidth = text.getBBox().width
 
         if x < @xNow and ((x + textWidth + 5) > @xNow)
-          text.attr("x", @xNow - textWidth - 5)
+          text.attr({"x": @xNow - textWidth - 5, })
 
         return text
 
@@ -137,9 +137,9 @@ Render a vertical line to show today.
         @paper
           .text(
             @xNow + 5,
-            y - @margin.bottom - 1,
+            y - @margin.bottom - 4,
             "Living my life, " + (new Moment().diff(@from, "days") * 100 / @days).toFixed(2) + "% done.")
-          .attr({ "fill": "#FF0000", "text-anchor": "start" })
+          .attr({ "fill": "#FF0000", "text-anchor": "start", "font-family": "inherit", "font-size": 12 })
 
 
 ## Entry point
