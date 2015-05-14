@@ -1,69 +1,69 @@
 {
   "from": "1981-03-12",
   "to": "2056-03-12",
-  "what": "I'm {age} and plan to live about {expantancy} years, which is very optimistic.",
+  "what": "I hope to live about 75 years:",
   "lines": [
     {
       "from": "1988-09-01",
       "to": "1995-05-25",
-      "what": "Studied in the Lyceum #100."
+      "what": "Education: Lyceum №100"
     },
     {
       "from": "1995-09-01",
       "to": "1998-05-25",
-      "what": "Studied in the public school #33."
+      "what": "Education: Public school №33"
     },
     {
       "from": "1998-09-01",
       "to": "2001-09-01",
-      "what": "Worked in NIOKB NESSY as labaratory."
+      "what": "Work: Laboratory in NIOKB NESSY"
     },
     {
       "from": "1999-09-01",
       "to": "2004-06-01",
-      "what": "Dnipropetrovsk State Financial Academy. Specialist of Enterprise Finances."
+      "what": "Education: Specialist, Finances, Dnipropetrovsk State Financial Academy"
     },
     {
       "from": "2002-02-25",
       "to": "2007-03-05",
-      "what": "Worked in Privatbank as economist."
+      "what": "Work: Economist in Privatbank"
     },
     {
       "from": "2004-08-06",
-      "what": "Married."
+      "what": "Married"
     },
     {
       "from": "2005-05-11",
-      "what": "Daughter."
+      "what": "Daughter"
     },
     {
       "from": "2007-03-05",
       "to": "2008-08-01",
-      "what": "Worked in Nebesa as Software Developer."
+      "what": "Work: Software Developer in Nebesa"
     },
     {
       "from": "2008-08-01",
       "to": "2009-09-01",
-      "what": "Worked in SaM Solutions GmbH as Software Developer."
+      "what": "Work: Software Developer in SaM Solutions GmbH"
     },
     {
       "from": "2009-10-01",
       "to": "2009-12-31",
-      "what": "Worked in Exigen as Software Developer."
+      "what": "Work: Software Developer in Exigen"
     },
     {
       "from": "2010-01-01",
       "to": "2014-04-18",
-      "what": "Worked in Sitecore Ukraine as Software Developer."
+      "what": "Work: Software Developer in Sitecore Ukraine"
     },
     {
       "from": "2014-05-01",
-      "to": "2041-03-12",
-      "what": "Working in Sitecore Denmark as Software Developer."
+      "to": "2048-03-12",
+      "what": "Work: Software Developer in Sitecore Denmark"
     },
     {
-      "from": "2041-03-12",
-      "what": "Expected retirement."
+      "from": "2048-03-12",
+      "what": "Time to relax"
     }
   ]
 }
