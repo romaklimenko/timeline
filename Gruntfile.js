@@ -7,7 +7,7 @@ module.exports = function(grunt) {
       compile: {
         files: {
           "main.js": "main.coffee",
-          "timeline.js": "timeline.coffee.md"
+          "timeline.js": "timeline.coffee"
         }
       }
     },
