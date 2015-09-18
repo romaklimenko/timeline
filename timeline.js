@@ -1,150 +1,179 @@
-(function() {
-  define(["jquery", "moment", "raphael"], (function(_this) {
-    return function($, Moment, Raphael) {
-      var dateToPx, render, renderEndMarker, renderFutureLine, renderLine, renderPastLine, renderStartMarker, renderText, renderToday, updateY;
-      _this.margin = {
-        top: 15,
-        right: 5,
-        bottom: 5,
-        left: 5
-      };
-      _this.lineHeight = 25;
-      _this.minimumWidth = 940;
-      dateToPx = function(date) {
-        return new Moment(date).diff(_this.from, "days") * _this.pixelsPerDay + _this.margin.left;
-      };
-      updateY = function() {
-        return _this.y = _this.lines.length * _this.lineHeight + _this.margin.top;
-      };
-      renderStartMarker = function(line) {
-        var startMarker;
-        startMarker = _this.paper.circle(dateToPx(line.from), _this.y, 3).attr({
-          "fill": "#000000",
-          "title": new Moment(line.from).year()
+/* global define */
+define(["jquery", "moment", "raphael"], (function($, Moment, Raphael) {
+  
+    // todo:
+    // Moment.diff
+    // Moment.year
+    // paper.circle
+    // paper.path
+    // paper.text
+    // paper.remove
+    // 
+  
+    var margin = {
+      top: 15,
+      right: 5,
+      bottom: 5,
+      left: 5
+    };
+    
+    var paper;
+    var to;
+    var from;
+    var width, height, pixelsPerDay;
+    var y;
+    
+    var xNow, days;
+    
+    var lines = [];
+
+    var lineHeight = 25;
+    var minimumWidth = 940;
+
+    var dateToPx = function(date) {
+      return new Moment(date).diff(from, "days") * pixelsPerDay + margin.left;
+    };
+
+    var updateY = function() {
+      return y = lines.length * lineHeight + margin.top;
+    };
+
+    var renderStartMarker = function(line) {
+      var startMarker;
+      startMarker = paper.circle(dateToPx(line.from), y, 3).attr({
+        "fill": "#000000",
+        "title": new Moment(line.from).year()
+      });
+      return startMarker;
+    };
+
+    var renderEndMarker = function(line) {
+      if (to === line.to) {
+        return;
+      }
+      return paper.circle(dateToPx(line.to), y, 3).attr({
+        "fill": "#000000",
+        "title": new Moment(line.to).year()
+      });
+    };
+
+    var renderPastLine = function(line) {
+      pastLine;
+      var pastLine, x0, x1;
+      x0 = dateToPx(line.from);
+      x1 = dateToPx(line.to);
+      if (x0 <= xNow) {
+        pastLine = paper.path("M" + x0 + " " + y + "L" + Math.min(x1, xNow) + " " + y).attr({
+          "stroke-width": 2
         });
-        return startMarker;
-      };
-      renderEndMarker = function(line) {
-        if (_this.to === line.to) {
-          return;
-        }
-        return _this.paper.circle(dateToPx(line.to), _this.y, 3).attr({
-          "fill": "#000000",
-          "title": new Moment(line.to).year()
+      }
+      return pastLine;
+    };
+
+    var renderFutureLine = function(line) {
+      var x0 = dateToPx(line.from);
+      var x1 = dateToPx(line.to);
+      if (x1 >= xNow) {
+        var futureLine = paper.path("M" + Math.max(x0, xNow) + " " + y + "L" + x1 + " " + y).attr({
+          "stroke-dasharray": "-",
+          "stroke-width": 2
         });
-      };
-      renderPastLine = function(line) {
-        pastLine;
-        var pastLine, x0, x1;
-        x0 = dateToPx(line.from);
-        x1 = dateToPx(line.to);
-        if (x0 <= _this.xNow) {
-          pastLine = _this.paper.path("M" + x0 + " " + _this.y + "L" + Math.min(x1, _this.xNow) + " " + _this.y).attr({
-            "stroke-width": 2
-          });
-        }
-        return pastLine;
-      };
-      renderFutureLine = function(line) {
-        futureLine;
-        var futureLine, x0, x1;
-        x0 = dateToPx(line.from);
-        x1 = dateToPx(line.to);
-        if (x1 >= _this.xNow) {
-          futureLine = _this.paper.path("M" + Math.max(x0, _this.xNow) + " " + _this.y + "L" + x1 + " " + _this.y).attr({
-            "stroke-dasharray": "-",
-            "stroke-width": 2
-          });
-        }
-        if (_this.to === line.to) {
+
+        if (to === line.to) {
           futureLine.attr({
             "arrow-end": "open"
           });
         }
-        return futureLine;
-      };
-      renderText = function(line) {
-        var text, textWidth, x;
-        x = dateToPx(line.from) + 2;
-        text = _this.paper.text(x, _this.y - 10, line.what).attr({
-          "text-anchor": "start",
-          "font-family": "inherit",
-          "font-size": 12
-        });
-        textWidth = text.getBBox().width;
-        if (x < _this.xNow && ((x + textWidth + 5) > _this.xNow)) {
-          text.attr({
-            "x": _this.xNow - textWidth - 5
-          });
-        }
-        return text;
-      };
-      renderLine = function(line) {
-        var result;
-        if (!line.to) {
-          line.to = _this.to;
-        }
-        if (!line.from) {
-          line.from = _this.from;
-        }
-        result = {};
-        result.pastLine = renderPastLine(line);
-        result.futureLine = renderFutureLine(line);
-        result.startMarker = renderStartMarker(line);
-        result.endMarker = renderEndMarker(line);
-        result.text = renderText(line);
-        return result;
-      };
-      renderToday = function() {
-        var y;
-        y = _this.paper.height;
-        _this.paper.path("M" + _this.xNow + " 0L" + _this.xNow + " " + y).attr({
-          "stroke": "#FF0000",
-          "stroke-width": 2
-        });
-        return _this.paper.text(_this.xNow + 5, y - _this.margin.bottom - 4, "Living my life, " + (new Moment().diff(_this.from, "days") * 100 / _this.days).toFixed(2) + "% done.").attr({
-          "fill": "#FF0000",
-          "text-anchor": "start",
-          "font-family": "inherit",
-          "font-size": 12
-        });
-      };
-      render = function(el, data) {
-        var age, expantancy, headerText, line, _i, _len, _ref;
-        _this.from = new Moment(data.from);
-        _this.to = new Moment(data.to);
-        if (_this.paper && _this.paper.remove) {
-          _this.paper.remove();
-        }
-        _this.days = _this.to.diff(_this.from, "days");
-        _this.width = Math.max(_this.minimumWidth, $(el).width()) - _this.margin.left - _this.margin.right;
-        _this.height = data.lines.length * _this.lineHeight + _this.margin.top + _this.margin.bottom;
-        _this.pixelsPerDay = _this.width / _this.days;
-        _this.xNow = dateToPx(new Date());
-        _this.lines = [];
-        _this.paper = new Raphael(el, _this.width + _this.margin.right + _this.margin.left, _this.height + _this.margin.top + _this.margin.bottom);
-        updateY();
-        age = new Moment().diff(_this.from, "years");
-        expantancy = new Moment(_this.to).diff(_this.from, "years");
-        headerText = data.what.replace("{age}", age).replace("{expantancy}", expantancy);
-        _this.lines.push(renderLine({
-          "from": _this.from,
-          "to": _this.to,
-          "what": headerText
-        }));
-        updateY();
-        _ref = data.lines;
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          line = _ref[_i];
-          _this.lines.push(renderLine(line));
-          updateY();
-        }
-        return renderToday();
-      };
-      return {
-        render: render
-      };
-    };
-  })(this));
+      }
 
-}).call(this);
+      return futureLine;
+    };
+
+    var renderText = function(line) {
+      var x = dateToPx(line.from) + 2;
+      var text = paper.text(x, y - 10, line.what).attr({
+        "text-anchor": "start",
+        "font-family": "inherit",
+        "font-size": 12
+      });
+
+      var textWidth = text.getBBox().width;
+      if (x < xNow && ((x + textWidth + 5) > xNow)) {
+        text.attr({
+          "x": xNow - textWidth - 5
+        });
+      }
+      return text;
+    };
+
+    var renderLine = function(line) {
+      var result;
+      if (!line.to) {
+        line.to = to;
+      }
+      if (!line.from) {
+        line.from = from;
+      }
+      result = {};
+      result.pastLine = renderPastLine(line);
+      result.futureLine = renderFutureLine(line);
+      result.startMarker = renderStartMarker(line);
+      result.endMarker = renderEndMarker(line);
+      result.text = renderText(line);
+      return result;
+    };
+
+    var renderToday = function() {
+      y = paper.height;
+
+      paper.path("M" + xNow + " 0L" + xNow + " " + y).attr({
+        "stroke": "#FF0000",
+        "stroke-width": 2
+      });
+
+      paper.text(xNow + 5, y - margin.bottom - 4, "Living my life, " + (new Moment().diff(from, "days") * 100 / days).toFixed(2) + "% done.").attr({
+        "fill": "#FF0000",
+        "text-anchor": "start",
+        "font-family": "inherit",
+        "font-size": 12
+      });
+    };
+
+    var render = function(el, data) {
+      var age, expantancy, headerText, line, _i, _len, _ref;
+      from = new Moment(data.from);
+      to = new Moment(data.to);
+      if (paper && paper.remove) {
+        paper.remove();
+      }
+      days = to.diff(from, "days");
+      width = Math.max(minimumWidth, $(el).width()) - margin.left - margin.right;
+      height = data.lines.length * lineHeight + margin.top + margin.bottom;
+      pixelsPerDay = width / days;
+      xNow = dateToPx(new Date());
+      lines = [];
+      paper = new Raphael(el, width + margin.right + margin.left, height + margin.top + margin.bottom);
+      updateY();
+      age = new Moment().diff(from, "years");
+      expantancy = new Moment(to).diff(from, "years");
+      headerText = data.what.replace("{age}", age).replace("{expantancy}", expantancy);
+      lines.push(renderLine({
+        "from": from,
+        "to": to,
+        "what": headerText
+      }));
+
+      updateY();
+      _ref = data.lines;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        line = _ref[_i];
+        lines.push(renderLine(line));
+        updateY();
+      }
+      renderToday();
+    };
+
+    return {
+      render: render
+    };
+  }));
