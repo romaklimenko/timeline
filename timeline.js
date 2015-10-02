@@ -1,85 +1,82 @@
 /* global define */
-define(["jquery", "moment", "raphael"], (function($, Moment, Raphael) {
-  
-    // todo:
-    // Moment.diff
-    // Moment.year
-    // paper.circle
-    // paper.path
-    // paper.text
-    // paper.remove
-    // 
-  
+define(["raphael"], (function(Raphael) {
     var margin = {
       top: 15,
       right: 5,
       bottom: 5,
       left: 5
     };
-    
+
+    var life = {};
+
     var paper;
-    var to;
-    var from;
     var width, height, pixelsPerDay;
-    var y;
-    
-    var xNow, days;
-    
-    var lines = [];
+
+    var xNow, days, y;
+
+    var lines;
 
     var lineHeight = 25;
     var minimumWidth = 940;
 
+    var dateDiff = function(startDate, endDate) {
+      return Math.abs((startDate - endDate) / 864e5);
+    };
+    
+    var yearDiff = function(startDate, endDate) {
+      var diff = endDate.getTime() - startDate.getTime();
+      return Math.abs(new Date(diff).getUTCFullYear() - 1970);
+    };
+    
+    var getAge = function(birthday) {
+      return yearDiff(birthday, new Date())
+    };
+
     var dateToPx = function(date) {
-      return new Moment(date).diff(from, "days") * pixelsPerDay + margin.left;
+      return dateDiff(date, life.startDate) * pixelsPerDay + margin.left;
     };
 
     var updateY = function() {
-      return y = lines.length * lineHeight + margin.top;
+      y = lines.length * lineHeight + margin.top;
     };
 
     var renderStartMarker = function(line) {
-      var startMarker;
-      startMarker = paper.circle(dateToPx(line.from), y, 3).attr({
+      return paper.circle(dateToPx(new Date(line.startDate)), y, 3).attr({
         "fill": "#000000",
-        "title": new Moment(line.from).year()
+        "title": new Date(line.startDate).getFullYear()
       });
-      return startMarker;
     };
 
     var renderEndMarker = function(line) {
-      if (to === line.to) {
+      if (life.endDate === line.endDate) {
         return;
       }
-      return paper.circle(dateToPx(line.to), y, 3).attr({
+      return paper.circle(dateToPx(new Date(line.endDate)), y, 3).attr({
         "fill": "#000000",
-        "title": new Moment(line.to).year()
+        "title": new Date(line.endDate).getFullYear()
       });
     };
 
     var renderPastLine = function(line) {
-      pastLine;
-      var pastLine, x0, x1;
-      x0 = dateToPx(line.from);
-      x1 = dateToPx(line.to);
+      var x0 = dateToPx(new Date(line.startDate));
+      var x1 = dateToPx(new Date(line.endDate));
       if (x0 <= xNow) {
-        pastLine = paper.path("M" + x0 + " " + y + "L" + Math.min(x1, xNow) + " " + y).attr({
+        return paper.path("M" + x0 + " " + y + "L" + Math.min(x1, xNow) + " " + y).attr({
           "stroke-width": 2
         });
       }
-      return pastLine;
     };
 
     var renderFutureLine = function(line) {
-      var x0 = dateToPx(line.from);
-      var x1 = dateToPx(line.to);
+      var x0 = dateToPx(new Date(line.startDate));
+      var x1 = dateToPx(new Date(line.endDate));
       if (x1 >= xNow) {
         var futureLine = paper.path("M" + Math.max(x0, xNow) + " " + y + "L" + x1 + " " + y).attr({
           "stroke-dasharray": "-",
           "stroke-width": 2
         });
 
-        if (to === line.to) {
+        if (life.endDate === line.endDate) {
           futureLine.attr({
             "arrow-end": "open"
           });
@@ -90,7 +87,7 @@ define(["jquery", "moment", "raphael"], (function($, Moment, Raphael) {
     };
 
     var renderText = function(line) {
-      var x = dateToPx(line.from) + 2;
+      var x = dateToPx(new Date(line.startDate)) + 2;
       var text = paper.text(x, y - 10, line.what).attr({
         "text-anchor": "start",
         "font-family": "inherit",
@@ -107,31 +104,30 @@ define(["jquery", "moment", "raphael"], (function($, Moment, Raphael) {
     };
 
     var renderLine = function(line) {
-      var result;
-      if (!line.to) {
-        line.to = to;
+      if (!line.endDate) {
+        line.endDate = life.endDate;
       }
-      if (!line.from) {
-        line.from = from;
+      if (!line.startDate) {
+        line.startDate = life.startDate;
       }
-      result = {};
-      result.pastLine = renderPastLine(line);
-      result.futureLine = renderFutureLine(line);
-      result.startMarker = renderStartMarker(line);
-      result.endMarker = renderEndMarker(line);
-      result.text = renderText(line);
-      return result;
+      return {
+        pastLine: renderPastLine(line),
+        futureLine: renderFutureLine(line),
+        startMarker: renderStartMarker(line),
+        endMarker: renderEndMarker(line),
+        text: renderText(line)
+      };
     };
 
     var renderToday = function() {
-      y = paper.height;
+      var y = paper.height;
 
       paper.path("M" + xNow + " 0L" + xNow + " " + y).attr({
         "stroke": "#FF0000",
         "stroke-width": 2
       });
 
-      paper.text(xNow + 5, y - margin.bottom - 4, "Living my life, " + (new Moment().diff(from, "days") * 100 / days).toFixed(2) + "% done.").attr({
+      paper.text(xNow + 5, y - margin.bottom - 4, "Living my life, " + (dateDiff(life.startDate, new Date()) * 100 / days).toFixed(2) + "% done.").attr({
         "fill": "#FF0000",
         "text-anchor": "start",
         "font-family": "inherit",
@@ -140,36 +136,35 @@ define(["jquery", "moment", "raphael"], (function($, Moment, Raphael) {
     };
 
     var render = function(el, data) {
-      var age, expantancy, headerText, line, _i, _len, _ref;
-      from = new Moment(data.from);
-      to = new Moment(data.to);
+      life.startDate = new Date(data.startDate);
+      life.endDate = new Date(data.endDate);
       if (paper && paper.remove) {
         paper.remove();
       }
-      days = to.diff(from, "days");
-      width = Math.max(minimumWidth, $(el).width()) - margin.left - margin.right;
+      days = dateDiff(life.startDate, life.endDate);
+      width = Math.max(minimumWidth, 960) - margin.left - margin.right;
       height = data.lines.length * lineHeight + margin.top + margin.bottom;
       pixelsPerDay = width / days;
       xNow = dateToPx(new Date());
       lines = [];
       paper = new Raphael(el, width + margin.right + margin.left, height + margin.top + margin.bottom);
       updateY();
-      age = new Moment().diff(from, "years");
-      expantancy = new Moment(to).diff(from, "years");
-      headerText = data.what.replace("{age}", age).replace("{expantancy}", expantancy);
+      var expectancy = yearDiff(life.startDate, life.endDate);
+      var headerText = data.what.replace("{age}", getAge(life.startDate)).replace("{expectancy}", expectancy);
       lines.push(renderLine({
-        "from": from,
-        "to": to,
+        "from": life.startDate,
+        "to": life.endDate,
         "what": headerText
       }));
 
       updateY();
-      _ref = data.lines;
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        line = _ref[_i];
+
+      for (var i = 0; i < data.lines.length; i++) {
+        var line = data.lines[i];
         lines.push(renderLine(line));
         updateY();
       }
+
       renderToday();
     };
 

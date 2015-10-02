@@ -12,8 +12,6 @@ And my dream to be on the cover of Men's Health magazine before I get 25, has no
 
 And my daughter is already 8 and I live with my wife 10 years, one third of my past life.
 
-After all these thoughts I came to idea to visualise events in my life. I drew a long horizontal line - my life. Under this line I drew shorter lines, for each significant period in my life. This is what I got:
-
-<img src="http://romaklimenko.com/img/Screenshot%202014-03-29%2023.58.27.png" alt="timeline" style="width:100%;" />
+After all these thoughts I came to idea to visualise events in my life. I drew a long horizontal line - my life. Under this line I drew shorter lines, for each significant period in my life. This is what I got: http://romaklimenko.com/timeline
 
 I find it very motivating to look on this time after time to save the feeling of where I am, where I could be and where I can be.

@@ -1,8 +1,0 @@
-{
-  "description": "timeline",
-  "dependencies": {
-    "grunt": "*",
-    "grunt-contrib-coffee": "*",
-    "grunt-contrib-watch": "*"
-  }
-}
