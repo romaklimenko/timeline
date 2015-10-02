@@ -1,7 +1,6 @@
 (function() {
   require.config({
     paths: {
-      "raphael": "./bower_components/raphael/raphael",
       "timeline": "./timeline"
     }
   });

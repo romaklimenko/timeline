@@ -1,5 +1,5 @@
 /* global define */
-define(["raphael"], (function(Raphael) {
+define([], (function() {
     var margin = {
       top: 15,
       right: 5,
