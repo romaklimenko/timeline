@@ -12,58 +12,32 @@ var data = {
   "endDate": "2056-03-12",
   "what": "I hope to live about 75 years:",
   "lines": [
-    {
-      "startDate": "1988-09-01", "endDate": "1995-05-25",
-      "what": "Studied at Lyceum №100"
-    },
-    {
-      "startDate": "1995-09-01", "endDate": "1998-05-25",
-      "what": "Studied at Public School №33"
-    },
-    {
-      "startDate": "1998-09-01", "endDate": "2001-09-01",
-      "what": "Laboratory in NIOKB NESSY"
-    },
-    {
-      "startDate": "1999-09-01", "endDate": "2004-06-01",
-      "what": "Studied at Dnipropetrovsk State Financial Academy. Financial Specialist."
-    },
-    {
-      "startDate": "2002-02-25", "endDate": "2007-03-05",
-      "what": "Economist in Privatbank"
-    },
-    {
-      "startDate": "2004-08-06",
-      "what": "Married"
-    },
-    {
-      "startDate": "2005-05-11",
-      "what": "Daughter"
-    },
-    {
-      "startDate": "2007-03-05", "endDate": "2008-08-01",
-      "what": "Software Developer in Nebesa"
-    },
-    {
-      "startDate": "2008-08-01", "endDate": "2009-09-01",
-      "what": "Software Developer in SaM Solutions GmbH"
-    },
-    {
-      "startDate": "2009-10-01", "endDate": "2009-12-31",
-      "what": "Software Developer in Exigen"
-    },
-    {
-      "startDate": "2010-01-01", "endDate": "2014-04-18",
-      "what": "Software Developer in Sitecore Ukraine"
-    },
-    {
-      "startDate": "2014-05-01", "endDate": "2048-03-12",
-      "what": "Software Developer in Sitecore Denmark"
-    },
-    {
-      "startDate": "2048-03-12",
-      "what": "Time to relax"
-    }
+    { "startDate": "1988-09-01", "endDate": "1995-05-25",
+      "what": "Studied at Lyceum №100" },
+    { "startDate": "1995-09-01", "endDate": "1998-05-25",
+      "what": "Studied at Public School №33" },
+    { "startDate": "1998-09-01", "endDate": "2001-09-01",
+      "what": "Laboratory in NIOKB NESSY" },
+    { "startDate": "1999-09-01", "endDate": "2004-06-01",
+      "what": "Studied at Dnipropetrovsk State Financial Academy. Financial Specialist." },
+    { "startDate": "2002-02-25", "endDate": "2007-03-05",
+      "what": "Economist in Privatbank" },
+    { "startDate": "2004-08-06",
+      "what": "Married" },
+    { "startDate": "2005-05-11",
+      "what": "Daughter" },
+    { "startDate": "2007-03-05", "endDate": "2008-08-01",
+      "what": "Software Developer in Nebesa" },
+    { "startDate": "2008-08-01", "endDate": "2009-09-01",
+      "what": "Software Developer in SaM Solutions GmbH" },
+    { "startDate": "2009-10-01", "endDate": "2009-12-31",
+      "what": "Software Developer in Exigen" },
+    { "startDate": "2010-01-01", "endDate": "2014-04-18",
+      "what": "Software Developer in Sitecore Ukraine" },
+    { "startDate": "2014-05-01", "endDate": "2048-03-12",
+      "what": "Software Developer in Sitecore Denmark" },
+    { "startDate": "2048-03-12",
+      "what": "Time to relax" }
   ]
 };
 
@@ -73,6 +47,10 @@ var SVG = function(element, width, height) {
 
 var path = function(svg, pathString, attributes) {
   svg.path(pathString).attr(attributes);
+};
+
+var circle = function(svg, x, y, radius, attributes) {
+  svg.circle(x, y, radius).attr(attributes);
 };
 
 var render = function(el) {
@@ -92,10 +70,11 @@ var render = function(el) {
   // inner functions ->
   var renderLine = function(line) {
     var renderStartMarker = function(line) {
-      svg.circle(dateToPx(new Date(line.startDate)), y, 3).attr({
-        "fill": "#000000",
-        "title": new Date(line.startDate).getFullYear()
-      });
+      circle(svg, dateToPx(new Date(line.startDate)), y, 3,
+        {
+          "fill": "#000000",
+          "title": new Date(line.startDate).getFullYear()
+        });
     };
 
     var renderEndMarker = function(line) {
@@ -103,18 +82,18 @@ var render = function(el) {
         return;
       }
 
-      svg.circle(dateToPx(new Date(line.endDate)), y, 3).attr({
-        "fill": "#000000",
-        "title": new Date(line.endDate).getFullYear()
-      });
+      circle(svg, dateToPx(new Date(line.endDate)), y, 3,
+        {
+          "fill": "#000000",
+          "title": new Date(line.endDate).getFullYear()
+        });
     };
 
     var renderPastLine = function(line) {
       var x0 = dateToPx(new Date(line.startDate));
       var x1 = dateToPx(new Date(line.endDate));
       if (x0 <= xNow) {
-        path(
-          svg,
+        path(svg,
           "M" + x0 + " " + y + "L" + Math.min(x1, xNow) + " " + y,
           { "stroke-width": 2 });
       }
@@ -124,17 +103,12 @@ var render = function(el) {
       var x0 = dateToPx(new Date(line.startDate));
       var x1 = dateToPx(new Date(line.endDate));
       if (x1 >= xNow) {
-        var pathString = "M" + Math.max(x0, xNow) + " " + y + "L" + x1 + " " + y;
-        var attributes = {
-          "stroke-dasharray": "-",
-          "stroke-width": 2
-        };
-
-        if (endOfLife === line.endDate) {
-          attributes["arrow-end"] = "open";
-        }
-
-        path(svg, pathString, attributes);
+        path(svg, "M" + Math.max(x0, xNow) + " " + y + "L" + x1 + " " + y,
+          {
+            "stroke-dasharray": "-",
+            "stroke-width": 2,
+            "arrow-end": endOfLife === line.endDate ? "open" : "none"
+          });
       }
     };
 
