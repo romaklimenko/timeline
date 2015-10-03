@@ -45,13 +45,17 @@ var SVG = function(element, width, height) {
   return new Raphael(element, width + margin.right + margin.left, height + margin.top + margin.bottom);
 };
 
-var path = function(svg, pathString, attributes) {
+var svgPath = function(svg, pathString, attributes) {
   svg.path(pathString).attr(attributes);
 };
 
-var circle = function(svg, x, y, radius, attributes) {
+var svgCircle = function(svg, x, y, radius, attributes) {
   svg.circle(x, y, radius).attr(attributes);
 };
+
+var svgText = function(svg, x, y, textString, attributes) {
+  return svg.text(x, y, textString).attr(attributes);
+}
 
 var render = function(el) {
   var lineHeight = 25;
@@ -70,7 +74,7 @@ var render = function(el) {
   // inner functions ->
   var renderLine = function(line) {
     var renderStartMarker = function(line) {
-      circle(svg, dateToPx(new Date(line.startDate)), y, 3,
+      svgCircle(svg, dateToPx(new Date(line.startDate)), y, 3,
         {
           "fill": "#000000",
           "title": new Date(line.startDate).getFullYear()
@@ -82,7 +86,7 @@ var render = function(el) {
         return;
       }
 
-      circle(svg, dateToPx(new Date(line.endDate)), y, 3,
+      svgCircle(svg, dateToPx(new Date(line.endDate)), y, 3,
         {
           "fill": "#000000",
           "title": new Date(line.endDate).getFullYear()
@@ -93,7 +97,7 @@ var render = function(el) {
       var x0 = dateToPx(new Date(line.startDate));
       var x1 = dateToPx(new Date(line.endDate));
       if (x0 <= xNow) {
-        path(svg,
+        svgPath(svg,
           "M" + x0 + " " + y + "L" + Math.min(x1, xNow) + " " + y,
           { "stroke-width": 2 });
       }
@@ -103,7 +107,7 @@ var render = function(el) {
       var x0 = dateToPx(new Date(line.startDate));
       var x1 = dateToPx(new Date(line.endDate));
       if (x1 >= xNow) {
-        path(svg, "M" + Math.max(x0, xNow) + " " + y + "L" + x1 + " " + y,
+        svgPath(svg, "M" + Math.max(x0, xNow) + " " + y + "L" + x1 + " " + y,
           {
             "stroke-dasharray": "-",
             "stroke-width": 2,
@@ -114,11 +118,12 @@ var render = function(el) {
 
     var renderText = function(line) {
       var x = dateToPx(new Date(line.startDate)) + 2;
-      var text = svg.text(x, y - 10, line.what).attr({
-        "text-anchor": "start",
-        "font-family": "inherit",
-        "font-size": 12
-      });
+      var text = svgText(svg, x, y - 10, line.what,
+        {
+          "text-anchor": "start",
+          "font-family": "inherit",
+          "font-size": 12
+        });
 
       var textWidth = text.getBBox().width;
       if (x < xNow && ((x + textWidth + 5) > xNow)) {
@@ -148,7 +153,7 @@ var render = function(el) {
   var renderToday = function() {
     var y = svg.height;
 
-    path(
+    svgPath(
       svg,
       "M" + xNow + " 0L" + xNow + " " + y,
       {
@@ -167,10 +172,6 @@ var render = function(el) {
 
   var beginningOfLife = new Date(data.startDate);
   var endOfLife = new Date(data.endDate);
-
-  if (svg && svg.remove) {
-    svg.remove();
-  }
 
   var days = dateDiff(beginningOfLife, endOfLife);
   var width = Math.max(minimumWidth, 960) - margin.left - margin.right;
