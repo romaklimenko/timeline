@@ -1,5 +1,3 @@
-/* global Raphael */
-/* global define */
 var margin = {
   top: 15,
   right: 5,
@@ -42,25 +40,79 @@ var data = {
 };
 
 var SVG = function(element, width, height) {
-  return new Raphael(element, width + margin.right + margin.left, height + margin.top + margin.bottom);
+  var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  setAttributes(svg, { "height": height, "width": width });
+  
+  var defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+
+  var markerCircle = document.createElementNS("http://www.w3.org/2000/svg", "marker");
+  setAttributes(markerCircle,
+  {
+    "id": "markerCircle",
+    "markerWidth": "8",
+    "markerHeight": "8",
+    "refX": "5",
+    "refY": "5"
+  });
+  
+  var circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+  setAttributes(circle,
+  {
+    "cx": "5",
+    "cy": "5",
+    "r": "1.5",
+    "style": "stroke: none; fill:#000000;"
+  });
+
+  markerCircle.appendChild(circle);
+  defs.appendChild(markerCircle);
+
+  var markerArrow = document.createElementNS("http://www.w3.org/2000/svg", "marker");
+  setAttributes(markerArrow,
+  {
+    "id": "markerArrow",
+    "markerWidth": "6",
+    "markerHeight": "6",
+    "refX": "5",
+    "refY": "3.5"
+  });
+  
+  var path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  setAttributes(path, { "d": "M0,1 6,3.5 0,6", "style": "fill:#000000;" });
+  markerArrow.appendChild(path);
+  defs.appendChild(markerArrow);
+
+  svg.appendChild(defs);
+  element.appendChild(svg);
+  return svg;
+};
+
+var setAttributes = function(element, attributes) {
+  for (var attribute in attributes) {
+    element.setAttribute(attribute, attributes[attribute])
+  }
 };
 
 var svgPath = function(svg, pathString, attributes) {
-  svg.path(pathString).attr(attributes);
-};
-
-var svgCircle = function(svg, x, y, radius, attributes) {
-  svg.circle(x, y, radius).attr(attributes);
+  var path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  attributes["d"] = pathString;
+  setAttributes(path, attributes);
+  svg.appendChild(path);
+  return path;
 };
 
 var svgText = function(svg, x, y, textString, attributes) {
-  return svg.text(x, y, textString).attr(attributes);
+  var text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  setAttributes(text, { "x": x, "y": y });
+  setAttributes(text, attributes);
+  text.innerHTML = textString;  
+  svg.appendChild(text);
+  return text;
 }
 
 var render = function(el) {
   var lineHeight = 25;
-  var minimumWidth = 940;
-
+  var minimumWidth = 980;
   var y = margin.top - lineHeight;
 
   var dateDiff = function(startDate, endDate) {
@@ -73,33 +125,18 @@ var render = function(el) {
 
   // inner functions ->
   var renderLine = function(line) {
-    var renderStartMarker = function(line) {
-      svgCircle(svg, dateToPx(new Date(line.startDate)), y, 3,
-        {
-          "fill": "#000000",
-          "title": new Date(line.startDate).getFullYear()
-        });
-    };
-
-    var renderEndMarker = function(line) {
-      if (endOfLife === line.endDate) {
-        return;
-      }
-
-      svgCircle(svg, dateToPx(new Date(line.endDate)), y, 3,
-        {
-          "fill": "#000000",
-          "title": new Date(line.endDate).getFullYear()
-        });
-    };
-
     var renderPastLine = function(line) {
       var x0 = dateToPx(new Date(line.startDate));
       var x1 = dateToPx(new Date(line.endDate));
       if (x0 <= xNow) {
         svgPath(svg,
           "M" + x0 + " " + y + "L" + Math.min(x1, xNow) + " " + y,
-          { "stroke-width": 2 });
+          {
+            "stroke-width": 2,
+            "stroke": "#000000",
+            "marker-start": "url(#markerCircle)",
+            "marker-end": x1 < xNow ? "url(#markerCircle)" : ""
+          });
       }
     };
 
@@ -109,16 +146,18 @@ var render = function(el) {
       if (x1 >= xNow) {
         svgPath(svg, "M" + Math.max(x0, xNow) + " " + y + "L" + x1 + " " + y,
           {
-            "stroke-dasharray": "-",
+            "stroke": "#000000",
+            "stroke-dasharray": "6,2",
             "stroke-width": 2,
-            "arrow-end": endOfLife === line.endDate ? "open" : "none"
+            "marker-start": x0 > xNow ? "url(#markerCircle)" : "",
+            "marker-end": endOfLife === line.endDate ? "url(#markerArrow)" : "url(#markerCircle)"
           });
       }
     };
 
     var renderText = function(line) {
       var x = dateToPx(new Date(line.startDate)) + 2;
-      var text = svgText(svg, x, y - 10, line.what,
+      var text = svgText(svg, x, y - 5, line.what,
         {
           "text-anchor": "start",
           "font-family": "inherit",
@@ -127,9 +166,7 @@ var render = function(el) {
 
       var textWidth = text.getBBox().width;
       if (x < xNow && ((x + textWidth + 5) > xNow)) {
-        text.attr({
-          "x": xNow - textWidth - 5
-        });
+        setAttributes(text, { "x": (xNow - textWidth - 5).toString() });
       }
     };
     
@@ -145,13 +182,11 @@ var render = function(el) {
 
     renderPastLine(line);
     renderFutureLine(line);
-    renderStartMarker(line);
-    renderEndMarker(line);
     renderText(line);
   };
 
   var renderToday = function() {
-    var y = svg.height;
+    var y = svg.attributes["height"].value;
 
     svgPath(
       svg,
@@ -161,7 +196,8 @@ var render = function(el) {
         "stroke-width": 2
       });
 
-    svg.text(xNow + 5, y - margin.bottom - 4, "Living my life, " + (dateDiff(beginningOfLife, new Date()) * 100 / days).toFixed(2) + "% done.").attr({
+    svgText(svg, xNow + 5, y - margin.bottom - 4, "Living my life, " + (dateDiff(beginningOfLife, new Date()) * 100 / days).toFixed(2) + "% done.",
+    {
       "fill": "#FF0000",
       "text-anchor": "start",
       "font-family": "inherit",
