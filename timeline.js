@@ -1,3 +1,4 @@
+/* global Raphael */
 /* global define */
 var margin = {
   top: 15,
@@ -66,6 +67,14 @@ var data = {
   ]
 };
 
+var SVG = function(element, width, height) {
+  return new Raphael(element, width + margin.right + margin.left, height + margin.top + margin.bottom);
+};
+
+var path = function(svg, pathString, attributes) {
+  svg.path(pathString).attr(attributes);
+};
+
 var render = function(el) {
   var lineHeight = 25;
   var minimumWidth = 940;
@@ -76,14 +85,6 @@ var render = function(el) {
     return Math.abs((startDate - endDate) / 864e5);
   };
 
-  var yearDiff = function(startDate, endDate) {
-    return Math.abs(new Date(endDate.getTime() - startDate.getTime()).getUTCFullYear() - 1970);
-  };
-
-  var getAge = function(birthday) {
-    return yearDiff(birthday, new Date())
-  };
-
   var dateToPx = function(date) {
     return dateDiff(date, beginningOfLife) * pixelsPerDay + margin.left;
   };
@@ -91,7 +92,7 @@ var render = function(el) {
   // inner functions ->
   var renderLine = function(line) {
     var renderStartMarker = function(line) {
-      paper.circle(dateToPx(new Date(line.startDate)), y, 3).attr({
+      svg.circle(dateToPx(new Date(line.startDate)), y, 3).attr({
         "fill": "#000000",
         "title": new Date(line.startDate).getFullYear()
       });
@@ -102,7 +103,7 @@ var render = function(el) {
         return;
       }
 
-      paper.circle(dateToPx(new Date(line.endDate)), y, 3).attr({
+      svg.circle(dateToPx(new Date(line.endDate)), y, 3).attr({
         "fill": "#000000",
         "title": new Date(line.endDate).getFullYear()
       });
@@ -112,9 +113,10 @@ var render = function(el) {
       var x0 = dateToPx(new Date(line.startDate));
       var x1 = dateToPx(new Date(line.endDate));
       if (x0 <= xNow) {
-        paper.path("M" + x0 + " " + y + "L" + Math.min(x1, xNow) + " " + y).attr({
-          "stroke-width": 2
-        });
+        path(
+          svg,
+          "M" + x0 + " " + y + "L" + Math.min(x1, xNow) + " " + y,
+          { "stroke-width": 2 });
       }
     };
 
@@ -122,22 +124,23 @@ var render = function(el) {
       var x0 = dateToPx(new Date(line.startDate));
       var x1 = dateToPx(new Date(line.endDate));
       if (x1 >= xNow) {
-        var futureLine = paper.path("M" + Math.max(x0, xNow) + " " + y + "L" + x1 + " " + y).attr({
+        var pathString = "M" + Math.max(x0, xNow) + " " + y + "L" + x1 + " " + y;
+        var attributes = {
           "stroke-dasharray": "-",
           "stroke-width": 2
-        });
+        };
 
         if (endOfLife === line.endDate) {
-          futureLine.attr({
-            "arrow-end": "open"
-          });
+          attributes["arrow-end"] = "open";
         }
+
+        path(svg, pathString, attributes);
       }
     };
 
     var renderText = function(line) {
       var x = dateToPx(new Date(line.startDate)) + 2;
-      var text = paper.text(x, y - 10, line.what).attr({
+      var text = svg.text(x, y - 10, line.what).attr({
         "text-anchor": "start",
         "font-family": "inherit",
         "font-size": 12
@@ -169,14 +172,17 @@ var render = function(el) {
   };
 
   var renderToday = function() {
-    var y = paper.height;
+    var y = svg.height;
 
-    paper.path("M" + xNow + " 0L" + xNow + " " + y).attr({
-      "stroke": "#FF0000",
-      "stroke-width": 2
-    });
+    path(
+      svg,
+      "M" + xNow + " 0L" + xNow + " " + y,
+      {
+        "stroke": "#FF0000",
+        "stroke-width": 2
+      });
 
-    paper.text(xNow + 5, y - margin.bottom - 4, "Living my life, " + (dateDiff(beginningOfLife, new Date()) * 100 / days).toFixed(2) + "% done.").attr({
+    svg.text(xNow + 5, y - margin.bottom - 4, "Living my life, " + (dateDiff(beginningOfLife, new Date()) * 100 / days).toFixed(2) + "% done.").attr({
       "fill": "#FF0000",
       "text-anchor": "start",
       "font-family": "inherit",
@@ -188,8 +194,8 @@ var render = function(el) {
   var beginningOfLife = new Date(data.startDate);
   var endOfLife = new Date(data.endDate);
 
-  if (paper && paper.remove) {
-    paper.remove();
+  if (svg && svg.remove) {
+    svg.remove();
   }
 
   var days = dateDiff(beginningOfLife, endOfLife);
@@ -197,7 +203,7 @@ var render = function(el) {
   var height = data.lines.length * lineHeight + margin.top + margin.bottom;
   var pixelsPerDay = width / days;
   var xNow = dateToPx(new Date());
-  var paper = new Raphael(el, width + margin.right + margin.left, height + margin.top + margin.bottom);
+  var svg = SVG(el, width + margin.right + margin.left, height + margin.top + margin.bottom);
   renderLine({
     "from": beginningOfLife,
     "to": endOfLife,
