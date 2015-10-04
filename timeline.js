@@ -1,40 +1,33 @@
-var margin = {
-  top: 15,
-  right: 5,
-  bottom: 5,
-  left: 5
-};
-
 var data = {
-  "startDate": "1981-03-12",
-  "endDate": "2056-03-12",
-  "what": "I hope to live about 75 years:",
+  "from": "1981-03-12",
+  "to": "2056-03-12",
+  "what": "Born in 1981, I hope to live about 75 years:",
   "lines": [
-    { "startDate": "1988-09-01", "endDate": "1995-05-25",
+    { "from": "1988-09-01", "to": "1995-05-25",
       "what": "Studied at Lyceum №100" },
-    { "startDate": "1995-09-01", "endDate": "1998-05-25",
+    { "from": "1995-09-01", "to": "1998-05-25",
       "what": "Studied at Public School №33" },
-    { "startDate": "1998-09-01", "endDate": "2001-09-01",
+    { "from": "1998-09-01", "to": "2001-09-01",
       "what": "Laboratory in NIOKB NESSY" },
-    { "startDate": "1999-09-01", "endDate": "2004-06-01",
+    { "from": "1999-09-01", "to": "2004-06-01",
       "what": "Studied at Dnipropetrovsk State Financial Academy. Financial Specialist." },
-    { "startDate": "2002-02-25", "endDate": "2007-03-05",
+    { "from": "2002-02-25", "to": "2007-03-05",
       "what": "Economist in Privatbank" },
-    { "startDate": "2004-08-06",
+    { "from": "2004-08-06",
       "what": "Married" },
-    { "startDate": "2005-05-11",
+    { "from": "2005-05-11",
       "what": "Daughter" },
-    { "startDate": "2007-03-05", "endDate": "2008-08-01",
+    { "from": "2007-03-05", "to": "2008-08-01",
       "what": "Software Developer in Nebesa" },
-    { "startDate": "2008-08-01", "endDate": "2009-09-01",
+    { "from": "2008-08-01", "to": "2009-09-01",
       "what": "Software Developer in SaM Solutions GmbH" },
-    { "startDate": "2009-10-01", "endDate": "2009-12-31",
+    { "from": "2009-10-01", "to": "2009-12-31",
       "what": "Software Developer in Exigen" },
-    { "startDate": "2010-01-01", "endDate": "2014-04-18",
+    { "from": "2010-01-01", "to": "2014-04-18",
       "what": "Software Developer in Sitecore Ukraine" },
-    { "startDate": "2014-05-01", "endDate": "2048-03-12",
+    { "from": "2014-05-01", "to": "2048-03-12",
       "what": "Software Developer in Sitecore Denmark" },
-    { "startDate": "2048-03-12",
+    { "from": "2048-03-12",
       "what": "Time to relax" }
   ]
 };
@@ -111,23 +104,29 @@ var svgText = function(svg, x, y, textString, attributes) {
 }
 
 var render = function(el) {
+  var margin = {
+    top: 15,
+    right: 5,
+    bottom: 5,
+    left: 5
+  };
+
   var lineHeight = 25;
   var minimumWidth = 900;
   var y = margin.top - lineHeight;
 
-  var dateDiff = function(startDate, endDate) {
-    return Math.abs((startDate - endDate) / 864e5);
+  var dateDiff = function(from, to) {
+    return Math.abs((from - to) / 864e5);
   };
 
   var dateToPx = function(date) {
     return dateDiff(date, beginningOfLife) * pixelsPerDay + margin.left;
   };
 
-  // inner functions ->
   var renderLine = function(line) {
     var renderPastLine = function(line) {
-      var x0 = dateToPx(new Date(line.startDate));
-      var x1 = dateToPx(new Date(line.endDate));
+      var x0 = dateToPx(new Date(line.from));
+      var x1 = dateToPx(new Date(line.to));
       if (x0 <= xNow) {
         svgPath(svg,
           "M" + x0 + " " + y + "L" + Math.min(x1, xNow) + " " + y,
@@ -141,8 +140,8 @@ var render = function(el) {
     };
 
     var renderFutureLine = function(line) {
-      var x0 = dateToPx(new Date(line.startDate));
-      var x1 = dateToPx(new Date(line.endDate));
+      var x0 = dateToPx(new Date(line.from));
+      var x1 = dateToPx(new Date(line.to));
       if (x1 >= xNow) {
         svgPath(svg, "M" + Math.max(x0, xNow) + " " + y + "L" + x1 + " " + y,
           {
@@ -150,13 +149,13 @@ var render = function(el) {
             "stroke-dasharray": "6,2",
             "stroke-width": 2,
             "marker-start": x0 > xNow ? "url(#markerCircle)" : "",
-            "marker-end": endOfLife === line.endDate ? "url(#markerArrow)" : "url(#markerCircle)"
+            "marker-end": endOfLife === line.to ? "url(#markerArrow)" : "url(#markerCircle)"
           });
       }
     };
 
     var renderText = function(line) {
-      var x = dateToPx(new Date(line.startDate)) + 2;
+      var x = dateToPx(new Date(line.from)) + 2;
       var text = svgText(svg, x, y - 5, line.what,
         {
           "text-anchor": "start",
@@ -170,12 +169,12 @@ var render = function(el) {
       }
     };
     
-    if (!line.endDate) {
-      line.endDate = endOfLife;
+    if (!line.to) {
+      line.to = endOfLife;
     }
 
-    if (!line.startDate) {
-      line.startDate = beginningOfLife;
+    if (!line.from) {
+      line.from = beginningOfLife;
     }
 
     y += lineHeight;
@@ -204,10 +203,9 @@ var render = function(el) {
       "font-size": 12
     });
   };
-  // <- inner functions
 
-  var beginningOfLife = new Date(data.startDate);
-  var endOfLife = new Date(data.endDate);
+  var beginningOfLife = new Date(data.from);
+  var endOfLife = new Date(data.to);
 
   var days = dateDiff(beginningOfLife, endOfLife);
   var width = Math.max(minimumWidth, 960) - margin.left - margin.right;
