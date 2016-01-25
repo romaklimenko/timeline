@@ -35,7 +35,7 @@ var data = {
 var SVG = function(element, width, height) {
   var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   setAttributes(svg, { "height": height, "width": width });
-  
+
   var defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
 
   var markerCircle = document.createElementNS("http://www.w3.org/2000/svg", "marker");
@@ -47,7 +47,7 @@ var SVG = function(element, width, height) {
     "refX": "5",
     "refY": "5"
   });
-  
+
   var circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
   setAttributes(circle,
   {
@@ -69,7 +69,7 @@ var SVG = function(element, width, height) {
     "refX": "5",
     "refY": "3.5"
   });
-  
+
   var path = document.createElementNS("http://www.w3.org/2000/svg", "path");
   setAttributes(path, { "d": "M0,1 6,3.5 0,6", "style": "fill:#000000;" });
   markerArrow.appendChild(path);
@@ -98,7 +98,7 @@ var svgText = function(svg, x, y, textString, attributes) {
   var text = document.createElementNS("http://www.w3.org/2000/svg", "text");
   setAttributes(text, { "x": x, "y": y });
   setAttributes(text, attributes);
-  text.innerHTML = textString;  
+  text.innerHTML = textString;
   svg.appendChild(text);
   return text;
 }
@@ -112,7 +112,7 @@ var render = function(el) {
   };
 
   var lineHeight = 25;
-  var minimumWidth = 900;
+  var minimumWidth = 860;
   var y = margin.top - lineHeight;
 
   var dateDiff = function(from, to) {
@@ -168,7 +168,7 @@ var render = function(el) {
         setAttributes(text, { "x": (xNow - textWidth - 5).toString() });
       }
     };
-    
+
     if (!line.to) {
       line.to = endOfLife;
     }
@@ -208,7 +208,7 @@ var render = function(el) {
   var endOfLife = new Date(data.to);
 
   var days = dateDiff(beginningOfLife, endOfLife);
-  var width = Math.max(minimumWidth, 960) - margin.left - margin.right;
+  var width = minimumWidth - margin.left - margin.right;
   var height = data.lines.length * lineHeight + margin.top + margin.bottom;
   var pixelsPerDay = width / days;
   var xNow = dateToPx(new Date());
