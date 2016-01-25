@@ -112,7 +112,7 @@ var svgText = function(svg, x, y, textString, attributes) {
 
 var render = function(el) {
   var lineHeight = 25;
-  var minimumWidth = 980;
+  var minimumWidth = 900;
   var y = margin.top - lineHeight;
 
   var dateDiff = function(startDate, endDate) {
